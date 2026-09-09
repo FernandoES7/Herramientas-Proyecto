@@ -35,3 +35,7 @@ build/
 ### Variables de entorno
 .env
 .env.*
+
+### Adicionales de Fernando
+README.md
+bd.sql
