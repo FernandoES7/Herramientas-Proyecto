@@ -24,4 +24,10 @@ public class ClienteService {
                 .map(clienteMapper::toResponse)
                 .toList();
     }
+
+    public List<ClienteResponse> filtrarPorDni(String dni) {
+        return clienteRepository.filtrarPorDni(dni).stream()
+                .map(clienteMapper::toResponse)
+                .toList();
+    }
 }
