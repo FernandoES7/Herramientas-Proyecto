@@ -12,4 +12,6 @@ public interface ClienteRepository {
     int eliminar(Integer idCliente);
 
     int actualizar(Cliente cliente);
+
+    Cliente insertar(Cliente cliente);
 }

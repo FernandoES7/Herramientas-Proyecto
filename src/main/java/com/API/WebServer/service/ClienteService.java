@@ -1,6 +1,7 @@
 package com.API.WebServer.service;
 
 import com.API.WebServer.dto.ClienteResponse;
+import com.API.WebServer.dto.ClienteCreateRequest;
 import com.API.WebServer.dto.ClienteUpdateRequest;
 import com.API.WebServer.model.Cliente;
 import com.API.WebServer.mapper.ClienteMapper;
@@ -45,6 +46,23 @@ public class ClienteService {
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "No se puede eliminar el cliente porque tiene registros asociados", ex);
+        }
+    }
+
+    @Transactional
+    public ClienteResponse insertar(ClienteCreateRequest request) {
+        validarTexto(request.nombres(), "nombres", 100, true);
+        validarTexto(request.apellidos(), "apellidos", 100, true);
+        validarTexto(request.dni(), "dni", 8, false);
+        validarTexto(request.telefono(), "telefono", 20, false);
+        validarTexto(request.direccion(), "direccion", 200, false);
+        Cliente cliente = new Cliente(null, request.nombres(), request.apellidos(),
+                request.dni(), request.telefono(), request.direccion(), request.fechaRegistro());
+        try {
+            return clienteMapper.toResponse(clienteRepository.insertar(cliente));
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Los datos del cliente incumplen una restriccion de la base de datos", ex);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.API.WebServer.controller;
 
 import com.API.WebServer.dto.ClienteResponse;
+import com.API.WebServer.dto.ClienteCreateRequest;
 import com.API.WebServer.dto.ClienteUpdateRequest;
 import com.API.WebServer.service.ClienteService;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +41,12 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable("idCliente") Integer idCliente) {
         clienteService.eliminar(idCliente);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClienteResponse insertar(@RequestBody ClienteCreateRequest request) {
+        return clienteService.insertar(request);
     }
 
     @PutMapping("/{idCliente}")

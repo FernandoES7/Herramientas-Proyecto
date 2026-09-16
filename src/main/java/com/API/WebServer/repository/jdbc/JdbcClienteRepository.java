@@ -3,6 +3,9 @@ package com.API.WebServer.repository.jdbc;
 import com.API.WebServer.model.Cliente;
 import com.API.WebServer.repository.ClienteRepository;
 import java.util.List;
+import java.sql.Statement;
+import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -21,6 +24,33 @@ public class JdbcClienteRepository implements ClienteRepository {
     );
 
     private final JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Cliente insertar(Cliente cliente) {
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            var statement = connection.prepareStatement("""
+                    INSERT INTO Cliente (nombres, apellidos, dni, telefono, direccion, fecha_registro)
+                    VALUES (?, ?, ?, ?, ?, COALESCE(?, CURRENT_DATE))
+                    """, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, cliente.nombres());
+            statement.setString(2, cliente.apellidos());
+            statement.setString(3, cliente.dni());
+            statement.setString(4, cliente.telefono());
+            statement.setString(5, cliente.direccion());
+            statement.setDate(6, cliente.fechaRegistro() == null
+                    ? null : java.sql.Date.valueOf(cliente.fechaRegistro()));
+            return statement;
+        }, keyHolder);
+        Number id = keyHolder.getKey();
+        if (id == null) {
+            throw new DataRetrievalFailureException("No se obtuvo el ID del cliente insertado");
+        }
+        return jdbcTemplate.queryForObject("""
+                SELECT id_cliente, nombres, apellidos, dni, telefono, direccion, fecha_registro
+                FROM Cliente WHERE id_cliente = ?
+                """, CLIENTE_ROW_MAPPER, id.intValue());
+    }
 
     @Override
     public int eliminar(Integer idCliente) {
