@@ -8,4 +8,8 @@ public interface ClienteRepository {
     List<Cliente> listar();
 
     List<Cliente> filtrarPorDni(String dni);
+
+    int eliminar(Integer idCliente);
+
+    int actualizar(Cliente cliente);
 }

@@ -22,6 +22,21 @@ public class JdbcClienteRepository implements ClienteRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @Override
+    public int eliminar(Integer idCliente) {
+        return jdbcTemplate.update("DELETE FROM Cliente WHERE id_cliente = ?", idCliente);
+    }
+
+    @Override
+    public int actualizar(Cliente cliente) {
+        return jdbcTemplate.update("""
+                UPDATE Cliente
+                SET nombres = ?, apellidos = ?, dni = ?, telefono = ?, direccion = ?, fecha_registro = ?
+                WHERE id_cliente = ?
+                """, cliente.nombres(), cliente.apellidos(), cliente.dni(), cliente.telefono(),
+                cliente.direccion(), cliente.fechaRegistro(), cliente.idCliente());
+    }
+
     public JdbcClienteRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
