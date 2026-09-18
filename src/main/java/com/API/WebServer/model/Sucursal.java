@@ -4,6 +4,7 @@ public record Sucursal(
         Integer idSucursal,
         String nombre,
         String direccion,
-        String telefono
+        String telefono,
+        String ciudad
 ) {
 }
