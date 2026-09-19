@@ -1,10 +1,9 @@
 package com.API.WebServer.controller;
 
 import com.API.WebServer.dto.CategoriaResponse;
+import com.API.WebServer.model.Categoria;
 import com.API.WebServer.service.CategoriaService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,5 +20,24 @@ public class CategoriaController {
     @GetMapping
     public List<CategoriaResponse> listar() {
         return categoriaService.listar();
+    }
+    @GetMapping("/{id}")
+    public CategoriaResponse buscarPorId(@PathVariable Integer id) {
+        return categoriaService.buscarPorId(id);
+    }
+
+    @PostMapping
+    public int guardar(@RequestBody Categoria categoria) {
+        return categoriaService.guardar(categoria);
+    }
+
+    @PutMapping("/{id}")
+    public int actualizar(@PathVariable Integer id, @RequestBody Categoria categoria) {
+        return categoriaService.actualizar(id, categoria);
+    }
+
+    @DeleteMapping("/{id}")
+    public int eliminar(@PathVariable Integer id) {
+        return categoriaService.eliminar(id);
     }
 }
