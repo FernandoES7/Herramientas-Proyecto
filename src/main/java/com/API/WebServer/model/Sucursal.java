@@ -1,6 +1,6 @@
-package com.API.WebServer.dto;
+package com.API.WebServer.model;
 
-public record SucursalResponse(
+public record Sucursal(
         Integer idSucursal,
         String nombre,
         String direccion,
