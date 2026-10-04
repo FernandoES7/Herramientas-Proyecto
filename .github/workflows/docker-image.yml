@@ -40,8 +40,10 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           MYSQL_DATABASE: testdb
+          MYSQL_USER: ${{ secrets.DB_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: rootpassword
         ports:
           - 3306:3306
         options: >-
@@ -51,7 +53,7 @@ jobs:
           --health-retries=5
 
     env:
-      DB_URL: ${{ secrets.DB_URL }}
+      DB_URL: jdbc:mysql://localhost:3306/testdb
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
