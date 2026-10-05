@@ -118,7 +118,7 @@ jobs:
         run: |
           $imageName = "${{ env.IMAGE_NAME }}".ToLower()
           $shortSha = "${{ github.sha }}".Substring(0, 7)
-          "name={{ env.REGISTRY }}/$imageName`:$shortSha" >> $env:GITHUB_OUTPUT
+          "name=${{ env.REGISTRY }}/$imageName`:$shortSha" >> $env:GITHUB_OUTPUT
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
