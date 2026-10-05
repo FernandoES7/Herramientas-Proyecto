@@ -106,9 +106,6 @@ jobs:
 
   deploy:
     runs-on: self-hosted
-    defaults:
-      run:
-        shell: bash
     needs: package
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: production
@@ -117,7 +114,11 @@ jobs:
     steps:
       - name: Compute image name
         id: img
-        run: echo "name=${{ env.REGISTRY }}/$(echo '${{ env.IMAGE_NAME }}' | tr '[:upper:]' '[:lower:]'):${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        shell: pwsh
+        run: |
+          $imageName = "${{ env.IMAGE_NAME }}".ToLower()
+          $shortSha = "${{ github.sha }}".Substring(0, 7)
+          "name={{ env.REGISTRY }}/$imageName`:$shortSha" >> $env:GITHUB_OUTPUT
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
