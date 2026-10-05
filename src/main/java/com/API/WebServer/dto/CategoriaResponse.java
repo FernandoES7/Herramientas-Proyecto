@@ -1,8 +1,17 @@
 package com.API.WebServer.dto;
 
-public record CategoriaResponse(
-        Integer idCategoria,
-        String nombre,
-        String descripcion
-) {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CategoriaResponse {
+
+    private Integer idCategoria;
+    private String nombre;
+    private String descripcion;
 }

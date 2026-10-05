@@ -1,49 +1,36 @@
 package com.API.WebServer.service;
 
-import com.API.WebServer.dto.CategoriaResponse;
-import com.API.WebServer.mapper.CategoriaMapper;
 import com.API.WebServer.model.Categoria;
 import com.API.WebServer.repository.CategoriaRepository;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
-    private final CategoriaMapper categoriaMapper;
 
-    public CategoriaService(CategoriaRepository categoriaRepository, CategoriaMapper categoriaMapper) {
-        this.categoriaRepository = categoriaRepository;
-        this.categoriaMapper = categoriaMapper;
+    public List<Categoria> listar() {
+        return categoriaRepository.listar();
     }
 
-    public List<CategoriaResponse> listar() {
-        return categoriaRepository.listar().stream()
-                .map(categoriaMapper::toResponse)
-                .toList();
-    }
-    public CategoriaResponse buscarPorId(Integer id) {
-        Categoria categoria = categoriaRepository.buscarPorId(id);
-        return categoria != null ? categoriaMapper.toResponse(categoria) : null;
+    public Optional<Categoria> buscarPorId(Integer idCategoria) {
+        return categoriaRepository.buscarPorId(idCategoria);
     }
 
-    @Transactional
-    public int guardar(Categoria categoria) {
+    public Categoria guardar(Categoria categoria) {
         return categoriaRepository.guardar(categoria);
     }
 
-    @Transactional
-    public int actualizar(Integer id, Categoria categoria) {
-        return categoriaRepository.actualizar(id, categoria);
+    public Categoria actualizar(Categoria categoria) {
+        return categoriaRepository.actualizar(categoria);
     }
 
-    @Transactional
-    public int eliminar(Integer id) {
-        return categoriaRepository.eliminar(id);
+    public void eliminar(Integer idCategoria) {
+        categoriaRepository.eliminar(idCategoria);
     }
-
-
 }
