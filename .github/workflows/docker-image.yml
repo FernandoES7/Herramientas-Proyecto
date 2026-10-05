@@ -130,10 +130,10 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           docker pull --platform linux/amd64 ${{ steps.img.outputs.name }}
-          docker rm -f app || true
-          docker run -d --name app --platform linux/amd64 -p 8080:8080 \
-            -e DB_URL \
-            -e DB_USERNAME \
-            -e DB_PASSWORD \
-            ${{ steps.img.outputs.name }}
+          docker rm -f app 2>$null
+          docker run -d --name app --platform linux/amd64 -p 8080:8080 `
+            -e DB_URL `
+            -e DB_USERNAME `
+            -e DB_PASSWORD `
+          ${{ steps.img.outputs.name }}
           docker image prune -f
