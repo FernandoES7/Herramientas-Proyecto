@@ -106,6 +106,9 @@ jobs:
 
   deploy:
     runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash
     needs: package
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: production
