@@ -136,7 +136,7 @@ jobs:
       - name: Create Kubernetes Secret
         env:
           DB_URL: ${{ secrets.DB_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           foreach ($name in @("DB_URL", "DB_USER", "DB_PASSWORD")) {
