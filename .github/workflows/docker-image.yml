@@ -109,31 +109,52 @@ jobs:
     needs: package
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment: production
+
     permissions:
+      contents: read
       packages: read
+
+    defaults:
+      run:
+        shell: pwsh
+
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Compute image name
         id: img
-        shell: pwsh
         run: |
+          $registry = "${{ env.REGISTRY }}"
           $imageName = "${{ env.IMAGE_NAME }}".ToLower()
-          $shortSha = "${{ github.sha }}".Substring(0, 7)
-          "name=${{ env.REGISTRY }}/$imageName`:$shortSha" >> $env:GITHUB_OUTPUT
+          $shortSha = $env:GITHUB_SHA.Substring(0, 7)
 
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+          $fullImage = "${registry}/${imageName}:${shortSha}"
 
-      - name: Run container on Docker Desktop
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          "name=$fullImage" >> $env:GITHUB_OUTPUT
+
+      - name: Apply manifests
         run: |
-          docker pull --platform linux/amd64 ${{ steps.img.outputs.name }}
-          docker rm -f app 2>$null
-          docker run -d --name app --platform linux/amd64 -p 8080:8080 `
-            -e DB_URL `
-            -e DB_USERNAME `
-            -e DB_PASSWORD `
-          ${{ steps.img.outputs.name }}
-          docker image prune -f
+          $image = "${{ steps.img.outputs.name }}"
+
+          (Get-Content k8s/deployment.yaml -Raw).Replace(
+            "IMAGE_PLACEHOLDER", $image
+          ) | kubectl --context docker-desktop apply -f -
+
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+          kubectl --context docker-desktop apply -f k8s/service.yaml
+
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Wait for rollout
+        run: |
+          kubectl --context docker-desktop rollout status deployment/demo --timeout=180s
+
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
