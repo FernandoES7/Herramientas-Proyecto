@@ -133,6 +133,40 @@ jobs:
 
           "name=$fullImage" >> $env:GITHUB_OUTPUT
 
+      - name: Create Kubernetes Secret
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          foreach ($name in @("DB_URL", "DB_USER", "DB_PASSWORD")) {
+          if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
+           throw "Missing required secret: $name"
+          }
+          }
+  
+          $secret = @{
+          apiVersion = "v1"
+          kind = "Secret"
+          metadata = @{
+           name = "mysql-credentials"
+           namespace = "default"
+          }
+          type = "Opaque"
+          stringData = @{
+           DB_URL = $env:DB_URL
+           DB_USER = $env:DB_USER
+           DB_PASSWORD = $env:DB_PASSWORD
+          }
+          }
+  
+          $json = $secret | ConvertTo-Json -Depth 10 -Compress
+          $json | kubectl --context docker-desktop apply -f -
+  
+          if ($LASTEXITCODE -ne 0) {
+          exit $LASTEXITCODE
+          }
+
       - name: Apply manifests
         run: |
           $image = "${{ steps.img.outputs.name }}"
