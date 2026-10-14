@@ -139,7 +139,7 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          foreach ($name in @("DB_URL", "DB_USER", "DB_PASSWORD")) {
+          foreach ($name in @("DB_URL", "DB_USERNAME", "DB_PASSWORD")) {
           if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
            throw "Missing required secret: $name"
           }
