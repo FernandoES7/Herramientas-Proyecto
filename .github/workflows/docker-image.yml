@@ -155,7 +155,7 @@ jobs:
           type = "Opaque"
           stringData = @{
            DB_URL = $env:DB_URL
-           DB_USER = $env:DB_USER
+           DB_USERNAME = $env:DB_USERNAME
            DB_PASSWORD = $env:DB_PASSWORD
           }
           }
