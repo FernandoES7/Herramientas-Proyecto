@@ -9,9 +9,9 @@ public class ClienteMapper {
 
     public ClienteResponse toResponse(Cliente cliente) {
         return new ClienteResponse(
-                cliente.idCliente(), cliente.nombres(), cliente.apellidos(),
-                cliente.dni(), cliente.telefono(), cliente.direccion(),
-                cliente.fechaRegistro()
+                cliente.getIdCliente(), cliente.getNombres(), cliente.getApellidos(),
+                cliente.getDni(), cliente.getTelefono(), cliente.getDireccion(),
+                cliente.getFechaRegistro()
         );
     }
 }
