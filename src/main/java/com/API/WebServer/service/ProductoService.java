@@ -2,17 +2,19 @@ package com.API.WebServer.service;
 
 import com.API.WebServer.model.Producto;
 import com.API.WebServer.repository.ProductoRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
+    }
 
     // Lista todos los productos
     public List<Producto> listar() {
