@@ -1,14 +1,19 @@
 package com.API.WebServer.mapper;
+
 import com.API.WebServer.dto.SucursalResponse;
 import com.API.WebServer.model.Sucursal;
+import org.springframework.stereotype.Component;
+
+@Component
 public class SucursalMapper {
-    public static SucursalResponse toResponse(Sucursal sucursal) {
+
+    public SucursalResponse toResponse(Sucursal sucursal) {
         return new SucursalResponse(
-                sucursal.idSucursal(),
-                sucursal.nombre(),
-                sucursal.direccion(),
-                sucursal.telefono(),
-                sucursal.ciudad()
+                sucursal.getIdSucursal(),
+                sucursal.getNombre(),
+                sucursal.getDireccion(),
+                sucursal.getTelefono(),
+                sucursal.getCiudad()
         );
     }
 }
