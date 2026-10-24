@@ -24,6 +24,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", exception.getMessage()));
     }
 
+    @ExceptionHandler(ProveedorConflictoException.class)
+    public ResponseEntity<Map<String, String>> manejarConflicto(ProveedorConflictoException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", exception.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> manejarValidacion(MethodArgumentNotValidException exception) {
         Map<String, String> errores = new LinkedHashMap<>();
