@@ -1,12 +1,7 @@
 package com.API.WebServer.repository;
 import com.API.WebServer.model.Sucursal;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
+public interface SucursalRepository extends JpaRepository<Sucursal, Long>{
 
-public interface SucursalRepository {
-    List<Sucursal> findAll();
-    Optional<Sucursal> findById(Integer id);
-    Sucursal save(Sucursal sucursal);
-    void deleteById(Integer id);
 }

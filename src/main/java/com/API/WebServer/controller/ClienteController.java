@@ -5,6 +5,8 @@ import com.API.WebServer.dto.ClienteCreateRequest;
 import com.API.WebServer.dto.ClienteUpdateRequest;
 import com.API.WebServer.service.ClienteService;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +35,7 @@ public class ClienteController {
     }
 
     @GetMapping(params = "dni")
-    public List<ClienteResponse> filtrarPorDni(@RequestParam("dni") String dni) {
+    public ClienteResponse filtrarPorDni(@RequestParam("dni") String dni) {
         return clienteService.filtrarPorDni(dni);
     }
 
@@ -45,13 +47,13 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClienteResponse insertar(@RequestBody ClienteCreateRequest request) {
+    public ClienteResponse insertar(@Valid @RequestBody ClienteCreateRequest request) {
         return clienteService.insertar(request);
     }
 
     @PutMapping("/{idCliente}")
     public ClienteResponse actualizar(@PathVariable("idCliente") Integer idCliente,
-                                      @RequestBody ClienteUpdateRequest request) {
+                                      @Valid @RequestBody ClienteUpdateRequest request) {
         return clienteService.actualizar(idCliente, request);
     }
 }
