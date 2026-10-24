@@ -1,13 +1,13 @@
 package com.API.WebServer.service;
 
 import java.util.List;
-import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.API.WebServer.dto.ProveedorResponse;
 import com.API.WebServer.dto.ProveedorRequest;
+import com.API.WebServer.dto.ProveedorResponse;
 import com.API.WebServer.exception.ProveedorNoEncontradoException;
 import com.API.WebServer.exception.RucDuplicadoException;
 import com.API.WebServer.mapper.ProveedorMapper;
@@ -16,15 +16,11 @@ import com.API.WebServer.repository.ProveedorRepository;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ProveedorService {
 
     private final ProveedorRepository proveedorRepository;
     private final ProveedorMapper proveedorMapper;
-
-    public ProveedorService(ProveedorRepository proveedorRepository, ProveedorMapper proveedorMapper) {
-        this.proveedorRepository = proveedorRepository;
-        this.proveedorMapper = proveedorMapper;
-    }
 
     public List<ProveedorResponse> listar() {
         return proveedorRepository.listar().stream()
@@ -55,19 +51,28 @@ public class ProveedorService {
         if (proveedorRepository.existePorRuc(request.getRuc())) {
             throw new RucDuplicadoException(request.getRuc());
         }
-        return proveedorMapper.toResponse(proveedorRepository.guardar(convertir(request, null)));
+        Proveedor proveedor = convertir(request, null);
+        return proveedorMapper.toResponse(proveedorRepository.guardar(proveedor));
     }
 
     @Transactional
     public ProveedorResponse actualizar(Integer idProveedor, ProveedorRequest request) {
         Proveedor actual = proveedorRepository.buscarPorId(idProveedor)
                 .orElseThrow(() -> new ProveedorNoEncontradoException(idProveedor));
-        Optional<Proveedor> conMismoRuc = proveedorRepository.buscarPorRuc(request.getRuc());
-        if (conMismoRuc.isPresent() && !conMismoRuc.get().getIdProveedor().equals(idProveedor)) {
-            throw new RucDuplicadoException(request.getRuc());
-        }
-        return proveedorMapper.toResponse(
-                proveedorRepository.actualizar(convertir(request, actual.getIdProveedor())));
+
+        proveedorRepository.buscarPorRuc(request.getRuc())
+                .filter(proveedor -> !proveedor.getIdProveedor().equals(idProveedor))
+                .ifPresent(proveedor -> {
+                    throw new RucDuplicadoException(request.getRuc());
+                });
+
+        actual.setRazonSocial(request.getRazonSocial());
+        actual.setRuc(request.getRuc());
+        actual.setTelefono(request.getTelefono());
+        actual.setCorreo(request.getCorreo());
+        actual.setDireccion(request.getDireccion());
+
+        return proveedorMapper.toResponse(proveedorRepository.actualizar(actual));
     }
 
     @Transactional
@@ -78,7 +83,13 @@ public class ProveedorService {
     }
 
     private Proveedor convertir(ProveedorRequest request, Integer idProveedor) {
-        return new Proveedor(idProveedor, request.getRazonSocial(), request.getRuc(),
-                request.getTelefono(), request.getCorreo(), request.getDireccion());
+        return Proveedor.builder()
+                .idProveedor(idProveedor)
+                .razonSocial(request.getRazonSocial())
+                .ruc(request.getRuc())
+                .telefono(request.getTelefono())
+                .correo(request.getCorreo())
+                .direccion(request.getDireccion())
+                .build();
     }
 }

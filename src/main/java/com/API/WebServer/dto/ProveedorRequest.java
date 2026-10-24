@@ -1,9 +1,18 @@
 package com.API.WebServer.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProveedorRequest {
 
     @NotBlank(message = "El RUC es obligatorio")
@@ -21,54 +30,23 @@ public class ProveedorRequest {
 
     private String direccion;
 
-    public ProveedorRequest() {
-    }
-
-    public ProveedorRequest(String ruc, String razonSocial, String telefono, String correo, String direccion) {
-        this.ruc = ruc;
-        this.razonSocial = razonSocial;
-        this.telefono = telefono;
-        this.correo = correo;
-        this.direccion = direccion;
-    }
-
-    public String getRuc() {
+    public String ruc() {
         return ruc;
     }
 
-    public void setRuc(String ruc) {
-        this.ruc = ruc;
-    }
-
-    public String getRazonSocial() {
+    public String razonSocial() {
         return razonSocial;
     }
 
-    public void setRazonSocial(String razonSocial) {
-        this.razonSocial = razonSocial;
-    }
-
-    public String getTelefono() {
+    public String telefono() {
         return telefono;
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getCorreo() {
+    public String correo() {
         return correo;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public String getDireccion() {
+    public String direccion() {
         return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
     }
 }

@@ -3,23 +3,53 @@ package com.API.WebServer.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import com.API.WebServer.model.Proveedor;
 
-public interface ProveedorRepository {
+@Repository
+public interface ProveedorRepository extends JpaRepository<Proveedor, Integer> {
 
-    List<Proveedor> listar();
+    Optional<Proveedor> findByRuc(String ruc);
 
-    Optional<Proveedor> buscarPorId(Integer idProveedor);
+    boolean existsByRuc(String ruc);
 
-    Optional<Proveedor> buscarPorRuc(String ruc);
+    @Query("SELECT p FROM Proveedor p WHERE LOWER(p.razonSocial) LIKE LOWER(CONCAT('%', :razonSocial, '%')) ORDER BY p.razonSocial")
+    List<Proveedor> buscarPorRazonSocial(@Param("razonSocial") String razonSocial);
 
-    List<Proveedor> buscarPorRazonSocial(String razonSocial);
+    default List<Proveedor> listar() {
+        return findAll();
+    }
 
-    boolean existePorRuc(String ruc);
+    default Optional<Proveedor> buscarPorId(Integer idProveedor) {
+        return findById(idProveedor);
+    }
 
-    Proveedor guardar(Proveedor proveedor);
 
-    Proveedor actualizar(Proveedor proveedor);
+    default Optional<Proveedor> buscarPorRuc(String ruc) {
+        return findByRuc(ruc);
+    }
 
-    int eliminar(Integer idProveedor);
+    default boolean existePorRuc(String ruc) {
+        return existsByRuc(ruc);
+    }
+
+    default Proveedor guardar(Proveedor proveedor) {
+        return save(proveedor);
+    }
+
+    default Proveedor actualizar(Proveedor proveedor) {
+        return save(proveedor);
+    }
+
+    default int eliminar(Integer idProveedor) {
+        if (!existsById(idProveedor)) {
+            return 0;
+        }
+        deleteById(idProveedor);
+        return 1;
+    }
 }
