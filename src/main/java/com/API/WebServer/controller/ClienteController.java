@@ -53,7 +53,7 @@ public class ClienteController {
 
     @PutMapping("/{idCliente}")
     public ClienteResponse actualizar(@PathVariable("idCliente") Integer idCliente,
-                                      @RequestBody ClienteUpdateRequest request) {
+                                      @Valid @RequestBody ClienteUpdateRequest request) {
         return clienteService.actualizar(idCliente, request);
     }
 }

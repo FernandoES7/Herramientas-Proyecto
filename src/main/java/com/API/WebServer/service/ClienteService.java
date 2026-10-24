@@ -55,7 +55,8 @@ public class ClienteService {
         Cliente cliente = clienteRepository.findById(idCliente).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         cliente.setNombres(request.nombres());
         cliente.setApellidos(request.apellidos());
-        cliente.setDireccion(request.dni());
+        cliente.setDni(request.dni());
+        cliente.setTelefono(request.telefono());
         cliente.setDireccion(request.direccion());
         return clienteMapper.toResponse(clienteRepository.save(cliente));
     }

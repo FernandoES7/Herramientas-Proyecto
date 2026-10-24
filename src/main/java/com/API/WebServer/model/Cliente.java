@@ -2,12 +2,11 @@ package com.API.WebServer.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.repository.NoRepositoryBean;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name="Cliente")
+@Table(name="`Cliente`")
 @Getter
 @Setter
 @Builder
