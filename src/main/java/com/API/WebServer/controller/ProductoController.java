@@ -4,7 +4,6 @@ import com.API.WebServer.dto.ProductoResponse;
 import com.API.WebServer.mapper.ProductoMapper;
 import com.API.WebServer.model.Producto;
 import com.API.WebServer.service.ProductoService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +11,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/productos")
-@RequiredArgsConstructor
 public class ProductoController {
 
     private final ProductoService productoService;
     private final ProductoMapper productoMapper;
+
+    public ProductoController(ProductoService productoService, ProductoMapper productoMapper) {
+        this.productoService = productoService;
+        this.productoMapper = productoMapper;
+    }
 
     // Listar todos los productos
     @GetMapping

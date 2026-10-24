@@ -9,11 +9,12 @@ public class ProveedorMapper {
 
     public ProveedorResponse toResponse(Proveedor proveedor) {
         return new ProveedorResponse(
-                proveedor.idProveedor(),
-                proveedor.razonSocial(),
-                proveedor.ruc(),
-                proveedor.telefono(),
-                proveedor.direccion()
+                proveedor.getIdProveedor(),
+                proveedor.getRazonSocial(),
+                proveedor.getRuc(),
+                proveedor.getTelefono(),
+                proveedor.getCorreo(),
+                proveedor.getDireccion()
         );
     }
 }

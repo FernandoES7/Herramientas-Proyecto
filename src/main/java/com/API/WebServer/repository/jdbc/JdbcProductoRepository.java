@@ -2,7 +2,6 @@ package com.API.WebServer.repository.jdbc;
 
 import com.API.WebServer.model.Producto;
 import com.API.WebServer.repository.ProductoRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -12,10 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
 public class JdbcProductoRepository implements ProductoRepository {
 
     private final JdbcTemplate jdbcTemplate;
+
+    public JdbcProductoRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     // Convierte cada fila de la BD en un objeto Producto
     private Producto mapRow(ResultSet rs, int rowNum) throws SQLException {
