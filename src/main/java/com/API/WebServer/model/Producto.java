@@ -1,101 +1,36 @@
 package com.API.WebServer.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "producto")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Producto {
 
-    private Integer idProducto;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_producto")
+    private Long idProducto;
+
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
+
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
+
+    @Column(name = "precio", nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
+
+    @Column(name = "stock", nullable = false)
     private Integer stock;
-    private Integer idCategoria;
 
-    public Producto() {
-    }
-
-    public Producto(Integer idProducto, String nombre, String descripcion,
-                    BigDecimal precio, Integer stock, Integer idCategoria) {
-        this.idProducto = idProducto;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.stock = stock;
-        this.idCategoria = idCategoria;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public Integer getIdProducto() {
-        return idProducto;
-    }
-
-    public void setIdProducto(Integer idProducto) {
-        this.idProducto = idProducto;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public BigDecimal getPrecio() {
-        return precio;
-    }
-
-    public Integer getStock() {
-        return stock;
-    }
-
-    public Integer getIdCategoria() {
-        return idCategoria;
-    }
-
-    public static class Builder {
-        private Integer idProducto;
-        private String nombre;
-        private String descripcion;
-        private BigDecimal precio;
-        private Integer stock;
-        private Integer idCategoria;
-
-        public Builder idProducto(Integer idProducto) {
-            this.idProducto = idProducto;
-            return this;
-        }
-
-        public Builder nombre(String nombre) {
-            this.nombre = nombre;
-            return this;
-        }
-
-        public Builder descripcion(String descripcion) {
-            this.descripcion = descripcion;
-            return this;
-        }
-
-        public Builder precio(BigDecimal precio) {
-            this.precio = precio;
-            return this;
-        }
-
-        public Builder stock(Integer stock) {
-            this.stock = stock;
-            return this;
-        }
-
-        public Builder idCategoria(Integer idCategoria) {
-            this.idCategoria = idCategoria;
-            return this;
-        }
-
-        public Producto build() {
-            return new Producto(idProducto, nombre, descripcion, precio, stock, idCategoria);
-        }
-    }
+    @Column(name = "id_categoria", nullable = false)
+    private Long idCategoria;
 }

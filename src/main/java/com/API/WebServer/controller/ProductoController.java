@@ -1,80 +1,53 @@
 package com.API.WebServer.controller;
 
+import com.API.WebServer.dto.ProductoCreateRequest;
 import com.API.WebServer.dto.ProductoResponse;
-import com.API.WebServer.mapper.ProductoMapper;
-import com.API.WebServer.model.Producto;
+import com.API.WebServer.dto.ProductoUpdateRequest;
 import com.API.WebServer.service.ProductoService;
-import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/productos")
+@RequiredArgsConstructor
 public class ProductoController {
 
     private final ProductoService productoService;
-    private final ProductoMapper productoMapper;
 
-    public ProductoController(ProductoService productoService, ProductoMapper productoMapper) {
-        this.productoService = productoService;
-        this.productoMapper = productoMapper;
-    }
-
-    // Listar todos los productos
     @GetMapping
-    public ResponseEntity<List<ProductoResponse>> listar() {
-
-        List<ProductoResponse> productos = productoService.listar()
-                .stream()
-                .map(productoMapper::toResponse)
-                .toList();
-
-        return ResponseEntity.ok(productos);
+    public List<ProductoResponse> listar() {
+        return productoService.listar();
     }
 
-    // Buscar producto por ID
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponse> buscarPorId(@PathVariable Integer id) {
-
-        return productoService.buscarPorId(id)
-                .map(productoMapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping(params = "idCategoria")
+    public List<ProductoResponse> listarPorCategoria(@RequestParam("idCategoria") Long idCategoria) {
+        return productoService.listarPorCategoria(idCategoria);
     }
 
-    // Registrar producto
+    @GetMapping("/{idProducto}")
+    public ProductoResponse buscarPorId(@PathVariable("idProducto") Long idProducto) {
+        return productoService.buscarPorId(idProducto);
+    }
+
     @PostMapping
-    public ResponseEntity<ProductoResponse> guardar(@RequestBody Producto producto) {
-
-        Producto productoGuardado = productoService.guardar(producto);
-
-        return ResponseEntity.ok(
-                productoMapper.toResponse(productoGuardado)
-        );
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductoResponse insertar(@Valid @RequestBody ProductoCreateRequest request) {
+        return productoService.insertar(request);
     }
 
-    // Actualizar producto
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductoResponse> actualizar(
-            @PathVariable Integer id,
-            @RequestBody Producto producto) {
-
-        producto.setIdProducto(id);
-
-        Producto productoActualizado = productoService.actualizar(producto);
-
-        return ResponseEntity.ok(
-                productoMapper.toResponse(productoActualizado)
-        );
+    @PutMapping("/{idProducto}")
+    public ProductoResponse actualizar(@PathVariable("idProducto") Long idProducto,
+                                       @Valid @RequestBody ProductoUpdateRequest request) {
+        return productoService.actualizar(idProducto, request);
     }
 
-    // Eliminar producto
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-
-        productoService.eliminar(id);
-
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/{idProducto}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable("idProducto") Long idProducto) {
+        productoService.eliminar(idProducto);
     }
 }
