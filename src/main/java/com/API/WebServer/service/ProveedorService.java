@@ -3,11 +3,13 @@ package com.API.WebServer.service;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.API.WebServer.dto.ProveedorRequest;
 import com.API.WebServer.dto.ProveedorResponse;
+import com.API.WebServer.exception.ProveedorConflictoException;
 import com.API.WebServer.exception.ProveedorNoEncontradoException;
 import com.API.WebServer.exception.RucDuplicadoException;
 import com.API.WebServer.mapper.ProveedorMapper;
@@ -23,19 +25,19 @@ public class ProveedorService {
     private final ProveedorMapper proveedorMapper;
 
     public List<ProveedorResponse> listar() {
-        return proveedorRepository.listar().stream()
+        return proveedorRepository.findAll().stream()
                 .map(proveedorMapper::toResponse)
                 .toList();
     }
 
     public ProveedorResponse buscarPorId(Integer idProveedor) {
-        return proveedorRepository.buscarPorId(idProveedor)
+        return proveedorRepository.findById(idProveedor)
                 .map(proveedorMapper::toResponse)
                 .orElseThrow(() -> new ProveedorNoEncontradoException(idProveedor));
     }
 
     public ProveedorResponse buscarPorRuc(String ruc) {
-        return proveedorRepository.buscarPorRuc(ruc)
+        return proveedorRepository.findByRuc(ruc)
                 .map(proveedorMapper::toResponse)
                 .orElseThrow(() -> new ProveedorNoEncontradoException(ruc));
     }
@@ -48,48 +50,61 @@ public class ProveedorService {
 
     @Transactional
     public ProveedorResponse crear(ProveedorRequest request) {
-        if (proveedorRepository.existePorRuc(request.getRuc())) {
-            throw new RucDuplicadoException(request.getRuc());
+        if (proveedorRepository.existsByRuc(request.ruc())) {
+            throw new RucDuplicadoException(request.ruc());
         }
-        Proveedor proveedor = convertir(request, null);
-        return proveedorMapper.toResponse(proveedorRepository.guardar(proveedor));
+        Proveedor proveedor = Proveedor.builder()
+                .razonSocial(request.razonSocial())
+                .ruc(request.ruc())
+                .telefono(request.telefono())
+                .correo(request.correo())
+                .direccion(request.direccion())
+                .build();
+        return proveedorMapper.toResponse(guardar(proveedor));
     }
 
     @Transactional
     public ProveedorResponse actualizar(Integer idProveedor, ProveedorRequest request) {
-        Proveedor actual = proveedorRepository.buscarPorId(idProveedor)
+        Proveedor actual = proveedorRepository.findById(idProveedor)
                 .orElseThrow(() -> new ProveedorNoEncontradoException(idProveedor));
 
-        proveedorRepository.buscarPorRuc(request.getRuc())
+        proveedorRepository.findByRuc(request.ruc())
                 .filter(proveedor -> !proveedor.getIdProveedor().equals(idProveedor))
                 .ifPresent(proveedor -> {
-                    throw new RucDuplicadoException(request.getRuc());
+                    throw new RucDuplicadoException(request.ruc());
                 });
 
-        actual.setRazonSocial(request.getRazonSocial());
-        actual.setRuc(request.getRuc());
-        actual.setTelefono(request.getTelefono());
-        actual.setCorreo(request.getCorreo());
-        actual.setDireccion(request.getDireccion());
+        actual.setRazonSocial(request.razonSocial());
+        actual.setRuc(request.ruc());
+        actual.setTelefono(request.telefono());
+        actual.setCorreo(request.correo());
+        actual.setDireccion(request.direccion());
 
-        return proveedorMapper.toResponse(proveedorRepository.actualizar(actual));
+        return proveedorMapper.toResponse(guardar(actual));
     }
 
     @Transactional
     public void eliminar(Integer idProveedor) {
-        if (proveedorRepository.eliminar(idProveedor) == 0) {
+        if (!proveedorRepository.existsById(idProveedor)) {
             throw new ProveedorNoEncontradoException(idProveedor);
+        }
+        try {
+            proveedorRepository.deleteById(idProveedor);
+            // flush para que el error de clave foránea salga aquí y no al terminar la transacción
+            proveedorRepository.flush();
+        } catch (DataIntegrityViolationException ex) {
+            throw new ProveedorConflictoException(
+                    "No se puede eliminar el proveedor porque tiene registros asociados", ex);
         }
     }
 
-    private Proveedor convertir(ProveedorRequest request, Integer idProveedor) {
-        return Proveedor.builder()
-                .idProveedor(idProveedor)
-                .razonSocial(request.getRazonSocial())
-                .ruc(request.getRuc())
-                .telefono(request.getTelefono())
-                .correo(request.getCorreo())
-                .direccion(request.getDireccion())
-                .build();
+    // saveAndFlush para que un dato repetido (teléfono, correo) dé 409 aquí y no un 500 al hacer commit
+    private Proveedor guardar(Proveedor proveedor) {
+        try {
+            return proveedorRepository.saveAndFlush(proveedor);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ProveedorConflictoException(
+                    "Los datos del proveedor incumplen una restricción de la base de datos", ex);
+        }
     }
 }

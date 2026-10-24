@@ -19,37 +19,4 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, Integer> {
 
     @Query("SELECT p FROM Proveedor p WHERE LOWER(p.razonSocial) LIKE LOWER(CONCAT('%', :razonSocial, '%')) ORDER BY p.razonSocial")
     List<Proveedor> buscarPorRazonSocial(@Param("razonSocial") String razonSocial);
-
-    default List<Proveedor> listar() {
-        return findAll();
-    }
-
-    default Optional<Proveedor> buscarPorId(Integer idProveedor) {
-        return findById(idProveedor);
-    }
-
-
-    default Optional<Proveedor> buscarPorRuc(String ruc) {
-        return findByRuc(ruc);
-    }
-
-    default boolean existePorRuc(String ruc) {
-        return existsByRuc(ruc);
-    }
-
-    default Proveedor guardar(Proveedor proveedor) {
-        return save(proveedor);
-    }
-
-    default Proveedor actualizar(Proveedor proveedor) {
-        return save(proveedor);
-    }
-
-    default int eliminar(Integer idProveedor) {
-        if (!existsById(idProveedor)) {
-            return 0;
-        }
-        deleteById(idProveedor);
-        return 1;
-    }
 }

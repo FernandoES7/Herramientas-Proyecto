@@ -40,24 +40,4 @@ public class Proveedor {
 
     @Column(name = "direccion")
     private String direccion;
-
-    public String ruc() {
-        return ruc;
-    }
-
-    public String razonSocial() {
-        return razonSocial;
-    }
-
-    public String telefono() {
-        return telefono;
-    }
-
-    public String correo() {
-        return correo;
-    }
-
-    public String direccion() {
-        return direccion;
-    }
 }
