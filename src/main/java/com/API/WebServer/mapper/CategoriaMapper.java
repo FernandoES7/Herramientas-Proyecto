@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 public class CategoriaMapper {
 
     public CategoriaResponse toResponse(Categoria categoria) {
-        return CategoriaResponse.builder()
-                .idCategoria(categoria.getIdCategoria())
-                .nombre(categoria.getNombre())
-                .descripcion(categoria.getDescripcion())
-                .build();
+        return new CategoriaResponse(
+                categoria.getIdCategoria(),
+                categoria.getNombre(),
+                categoria.getDescripcion()
+        );
     }
 }

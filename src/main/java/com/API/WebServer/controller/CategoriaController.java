@@ -1,11 +1,12 @@
 package com.API.WebServer.controller;
 
+import com.API.WebServer.dto.CategoriaCreateRequest;
 import com.API.WebServer.dto.CategoriaResponse;
-import com.API.WebServer.mapper.CategoriaMapper;
-import com.API.WebServer.model.Categoria;
+import com.API.WebServer.dto.CategoriaUpdateRequest;
 import com.API.WebServer.service.CategoriaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,44 +17,42 @@ import java.util.List;
 public class CategoriaController {
 
     private final CategoriaService categoriaService;
-    private final CategoriaMapper categoriaMapper;
 
     @GetMapping
-    public ResponseEntity<List<CategoriaResponse>> listar() {
-        List<CategoriaResponse> categorias = categoriaService.listar()
-                .stream()
-                .map(categoriaMapper::toResponse)
-                .toList();
-        return ResponseEntity.ok(categorias);
+    public List<CategoriaResponse> listar() {
+        return categoriaService.listar();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoriaResponse> buscarPorId(@PathVariable Integer id) {
-        return categoriaService.buscarPorId(id)
-                .map(categoriaMapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping(params = "nombre")
+    public List<CategoriaResponse> buscarPorNombre(@RequestParam("nombre") String nombre) {
+        return categoriaService.buscarPorNombre(nombre);
+    }
+
+    @GetMapping("/{idCategoria}")
+    public CategoriaResponse buscarPorId(@PathVariable("idCategoria") Integer idCategoria) {
+        return categoriaService.buscarPorId(idCategoria);
+    }
+
+    @GetMapping("/exacto/{nombre}")
+    public CategoriaResponse buscarPorNombreExacto(@PathVariable("nombre") String nombre) {
+        return categoriaService.buscarPorNombreExacto(nombre);
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaResponse> guardar(@RequestBody Categoria categoria) {
-        Categoria categoriaGuardada = categoriaService.guardar(categoria);
-        return ResponseEntity.ok(categoriaMapper.toResponse(categoriaGuardada));
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoriaResponse insertar(@Valid @RequestBody CategoriaCreateRequest request) {
+        return categoriaService.insertar(request);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CategoriaResponse> actualizar(
-            @PathVariable Integer id,
-            @RequestBody Categoria categoria) {
-
-        categoria.setIdCategoria(id);
-        Categoria categoriaActualizada = categoriaService.actualizar(categoria);
-        return ResponseEntity.ok(categoriaMapper.toResponse(categoriaActualizada));
+    @PutMapping("/{idCategoria}")
+    public CategoriaResponse actualizar(@PathVariable("idCategoria") Integer idCategoria,
+                                        @Valid @RequestBody CategoriaUpdateRequest request) {
+        return categoriaService.actualizar(idCategoria, request);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        categoriaService.eliminar(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/{idCategoria}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable("idCategoria") Integer idCategoria) {
+        categoriaService.eliminar(idCategoria);
     }
 }
