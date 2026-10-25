@@ -39,3 +39,4 @@ build/
 ### Adicionales de Fernando
 README.md
 bd.sql
+logs/*
