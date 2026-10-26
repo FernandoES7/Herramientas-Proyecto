@@ -1,46 +1,60 @@
 package com.API.WebServer.controller;
 
-import com.API.WebServer.dto.EmpleadoRequest;
 import com.API.WebServer.dto.EmpleadoResponse;
+import com.API.WebServer.dto.EmpleadoCreateRequest;
+import com.API.WebServer.dto.EmpleadoUpdateRequest;
 import com.API.WebServer.service.EmpleadoService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/empleados")
 public class EmpleadoController {
 
-    @Autowired
-    private EmpleadoService empleadoService;
+    private final EmpleadoService empleadoService;
 
-    @GetMapping
-    public ResponseEntity<List<EmpleadoResponse>> listarEmpleados() {
-        return ResponseEntity.ok(empleadoService.listarTodos());
+    public EmpleadoController(EmpleadoService empleadoService) {
+        this.empleadoService = empleadoService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseEntity<EmpleadoResponse>> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(ResponseEntity.ok(empleadoService.buscarPorId(id)));
+    @GetMapping
+    public List<EmpleadoResponse> listar() {
+        return empleadoService.listar();
+    }
+
+    @GetMapping(params = "dni")
+    public EmpleadoResponse filtrarPorDni(@RequestParam("dni") String dni) {
+        return empleadoService.filtrarPorDni(dni);
+    }
+
+    @DeleteMapping("/{idEmpleado}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable("idEmpleado") Integer idEmpleado) {
+        empleadoService.eliminar(idEmpleado);
     }
 
     @PostMapping
-    public ResponseEntity<EmpleadoResponse> crearEmpleado(@RequestBody EmpleadoRequest request) {
-        EmpleadoResponse nuevoEmpleado = empleadoService.guardar(request);
-        return new ResponseEntity<>(nuevoEmpleado, HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public EmpleadoResponse insertar(@Valid @RequestBody EmpleadoCreateRequest request) {
+        return empleadoService.insertar(request);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EmpleadoResponse> actualizarEmpleado(@PathVariable Integer id, @RequestBody EmpleadoRequest request) {
-        return ResponseEntity.ok(empleadoService.actualizar(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarEmpleado(@PathVariable Integer id) {
-        empleadoService.eliminar(id);
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{idEmpleado}")
+    public EmpleadoResponse actualizar(@PathVariable("idEmpleado") Integer idEmpleado,
+                                      @Valid @RequestBody EmpleadoUpdateRequest request) {
+        return empleadoService.actualizar(idEmpleado, request);
     }
 }
+
