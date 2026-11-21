@@ -37,6 +37,5 @@ build/
 .env.*
 
 ### Adicionales de Fernando
-README.md
 bd.sql
 logs/*
