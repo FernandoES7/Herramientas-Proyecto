@@ -1,4 +1,5 @@
 package com.API.WebServer.service;
+import com.API.WebServer.repository.CategoriaRepository;
 
 import com.API.WebServer.dto.ProductoCreateRequest;
 import com.API.WebServer.dto.ProductoResponse;
@@ -22,6 +23,7 @@ public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final ProductoMapper productoMapper;
+    private final CategoriaRepository categoriaRepository;
 
     public List<ProductoResponse> listar() {
         return productoRepository.findAll().stream()
@@ -41,8 +43,18 @@ public class ProductoService {
 
     @Transactional
     public ProductoResponse insertar(ProductoCreateRequest request) {
-        Producto producto = new Producto(null, request.nombre(), request.descripcion(),
-                request.precio(), request.stock(), request.idCategoria());
+
+        validarCategoria(request.idCategoria());
+
+        Producto producto = new Producto(
+                null,
+                request.nombre(),
+                request.descripcion(),
+                request.precio(),
+                request.stock(),
+                request.idCategoria()
+        );
+
         return productoMapper.toResponse(guardar(producto));
     }
 
@@ -74,6 +86,19 @@ public class ProductoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
     }
 
+    private void validarCategoria(Long idCategoria) {
+        if (idCategoria == null
+                || idCategoria <= 0
+                || idCategoria > Integer.MAX_VALUE
+                || !categoriaRepository.existsById(idCategoria.intValue())) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La categoria " + idCategoria + " no existe"
+            );
+        }
+    }
+
     // saveAndFlush envia el INSERT/UPDATE en este momento, asi si la categoria no existe
     // (llave foranea) el error se captura aqui y se responde 400 en lugar de un 500.
     private Producto guardar(Producto producto) {
@@ -84,4 +109,5 @@ public class ProductoService {
                     "La categoria " + producto.getIdCategoria() + " no existe", ex);
         }
     }
+
 }
